@@ -1,0 +1,99 @@
+server:
+  port: ${PORT:8080}
+
+spring:
+  application:
+    name: pulsetrade-backend
+
+  datasource:
+    # Your local MySQL. The "pulsetrade" database is created automatically on first start.
+    url: ${DB_URL:jdbc:mysql://localhost:3306/pulsetrade?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true}
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:root}   # <-- change to your MySQL root password (or set DB_PASSWORD)
+
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: none          # Flyway owns the schema (src/main/resources/db/migration)
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+          batch_size: 50
+
+  flyway:
+    enabled: true
+
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        "[spring.json.add.type.headers]": false
+    consumer:
+      auto-offset-reset: latest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      properties:
+        "[spring.deserializer.value.delegate.class]": org.springframework.kafka.support.serializer.JsonDeserializer
+        "[spring.json.trusted.packages]": com.pulsetrade.*
+        "[spring.json.value.default.type]": com.pulsetrade.event.PriceTick
+        "[spring.json.use.type.headers]": false
+
+  jackson:
+    generator:
+      write-bigdecimal-as-plain: true
+
+  # Email is optional. Set MAIL_HOST etc. and NOTIFICATIONS_EMAIL_ENABLED=true to turn it on.
+  mail:
+    host: ${MAIL_HOST:}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+
+app:
+  jwt:
+    # Override in production with a long random value: JWT_SECRET
+    secret: ${JWT_SECRET:dev-only-secret-change-me-please-0123456789-abcdefghijklmnop}
+    expiration-minutes: ${JWT_EXPIRATION_MINUTES:1440}
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000,https://*.netlify.app,https://*.vercel.app}
+  prices:
+    source: ${PRICE_SOURCE:binance}   # binance | simulated | none
+    symbols: ${PRICE_SYMBOLS:BTCUSDT,ETHUSDT,SOLUSDT,BNBUSDT,XRPUSDT,ADAUSDT,DOGEUSDT,AVAXUSDT,DOTUSDT,LINKUSDT,LTCUSDT,TRXUSDT,SHIBUSDT,ATOMUSDT,POLUSDT}
+    binance-url: ${BINANCE_WS_URL:wss://stream.binance.com:9443/stream}
+    broadcast-interval-ms: 1000
+    history-sample-seconds: 30
+    history-retention-days: 8
+  notifications:
+    email-enabled: ${NOTIFICATIONS_EMAIL_ENABLED:false}
+    from-address: ${MAIL_FROM:alerts@pulsetrade.dev}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus,metrics
+  endpoint:
+    health:
+      show-details: when-authorized
+  health:
+    mail:
+      enabled: false
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+
+logging:
+  level:
+    org.apache.kafka: WARN

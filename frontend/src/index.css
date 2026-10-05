@@ -1,0 +1,77 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /* Theme palette as RGB triplets, consumed by tailwind.config.js. Dark is the default. */
+  :root {
+    color-scheme: dark;
+    --bg-base: 10 14 23;
+    --bg-surface: 17 24 39;
+    --bg-card: 22 29 46;
+    --bg-hover: 30 39 64;
+    --bg-border: 37 48 77;
+    --fg-100: 241 245 249;
+    --fg-200: 226 232 240;
+    --fg-300: 203 213 225;
+    --fg-400: 148 163 184;
+  }
+  .light {
+    color-scheme: light;
+    --bg-base: 241 245 249;
+    --bg-surface: 255 255 255;
+    --bg-card: 255 255 255;
+    --bg-hover: 226 232 240;
+    --bg-border: 203 213 225;
+    --fg-100: 15 23 42;
+    --fg-200: 30 41 59;
+    --fg-300: 51 65 85;
+    --fg-400: 71 85 105;
+  }
+  /* Pale brand blues are made for dark backgrounds; use a deeper blue on light ones for contrast. */
+  .light .text-brand-300,
+  .light .text-brand-400 {
+    color: rgb(37 99 235);
+  }
+  html {
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+  body {
+    @apply bg-bg-base text-slate-200 antialiased transition-colors duration-200;
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-bg-card border border-bg-border rounded-xl;
+  }
+  .skeleton {
+    @apply bg-gradient-to-r from-bg-surface via-bg-hover to-bg-surface bg-[length:200%_100%] animate-shimmer;
+  }
+  .tabular {
+    font-family: 'JetBrains Mono', monospace;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
+  }
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(var(--bg-border)) transparent;
+  }
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    @apply bg-bg-border rounded-full;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
