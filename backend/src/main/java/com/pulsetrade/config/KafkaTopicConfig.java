@@ -13,6 +13,6 @@ public class KafkaTopicConfig {
     @Bean
     public NewTopic priceUpdatesTopic() {
         // Keyed by symbol, so every tick for one symbol stays ordered on one partition.
-        return TopicBuilder.name(PRICE_UPDATES_TOPIC).partitions(3).replicas(1).build();
+        return TopicBuilder.name(PRICE_UPDATES_TOPIC).partitions(2).replicas(1).build();
     }
 }
